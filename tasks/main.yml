@@ -1,0 +1,38 @@
+---
+- name: Alter DB for Aurora Mysql
+  block:
+    - name: Copy Script to localhost
+      template:
+        src: mysql.sh.j2
+        dest: /tmp/mysql.sh
+        mode: 744
+      delegate_to: localhost
+
+    - name: Altering DB and Tables characterset
+      local_action: shell /tmp/mysql.sh
+      become: true
+
+    - name: Removing script
+      file:
+        path: /tmp/mysql.sh
+        state: absent
+      delegate_to: localhost
+  when: mysql_db_type_aurora
+
+- name: Alter DB for Percona Mysql
+  block:
+    - name: Copy Script to Percona Server
+      template:
+        src: mysql.sh.j2
+        dest: /tmp/mysql.sh
+        mode: 744
+
+    - name: Altering DB and Tables characterset
+      command: /tmp/mysql.sh
+      become: true
+
+    - name: Removing script
+      file:
+        path: /tmp/mysql.sh
+        state: absent
+  when: not mysql_db_type_aurora

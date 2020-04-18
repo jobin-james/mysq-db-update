@@ -1,0 +1,11 @@
+---
+vault_mysql_login_host: []
+vault_mysql_login_user: []
+vault_mysql_login_password: []
+
+mysql_db_name: []
+mysql_character_set: "utf8mb4"
+mysql_collation: "utf8mb4_unicode_ci"
+
+#Specify true or false  here
+mysql_db_type_aurora: []

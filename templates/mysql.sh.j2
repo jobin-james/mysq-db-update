@@ -1,0 +1,19 @@
+#!/bin/bash
+
+database='{{ mysql_db_name }}'
+user='{{ vault_mysql_login_user }}'
+pass='{{ vault_mysql_login_password }}'
+{% if mysql_db_type_aurora %}
+host='{{ vault_mysql_login_host }}'
+{% endif %}
+charset='{{ mysql_character_set }}'
+collate='{{ mysql_collation }}'
+
+echo "Changing charset of database: $database"
+mysql -u$user -p$pass {% if mysql_db_type_aurora %} -h $host {% endif %} $database -s -e "ALTER DATABASE $database CHARACTER SET = $charset COLLATE = $collate;"
+
+for table in $(mysql -u$user -p$pass {% if mysql_db_type_aurora %} -h $host {% endif %} $database -s --skip-column-names -e 'show tables')
+do
+  echo "Converting charset of table: $table"
+  mysql -u$user -p$pass {% if mysql_db_type_aurora %} -h $host {% endif %} $database -s -e "ALTER TABLE $table CONVERT TO CHARACTER SET $charset COLLATE $collate"
+done
